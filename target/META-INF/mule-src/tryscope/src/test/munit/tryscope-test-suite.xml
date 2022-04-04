@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="tryscope-test-suite.xml" />
+	<munit:test name="tryscope-test-suite-tryscopeFlowTest" doc:id="cee7a726-7324-477b-995c-5346f3efdee8" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to tryscopeFlow" doc:id="03ea15eb-d6a8-407f-99e2-aea9ddf13d41" name="tryscopeFlow"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="tryscope-test-suite-tryscopeFlowTest1" doc:id="ea27b388-c3ef-41d2-bd39-bf53170aa9d3" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to tryscopeFlow" doc:id="b8f503fe-dbfb-4bba-9d67-3431c19119df" name="tryscopeFlow"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

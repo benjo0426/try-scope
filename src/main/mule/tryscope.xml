@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3628b630-82ac-40eb-93c4-958a29a31bb5" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="3a248ea5-6a0f-49c8-9bb4-fbcc0b18478b" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="muletrainingdb"/>
+	</db:config>
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="a28267d7-7f1b-4bff-8e14-45042f0eb088" >
+		<jms:active-mq-connection username="admin" password="admin">
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616 " />
+		</jms:active-mq-connection>
+	</jms:config>
+	<flow name="tryscopeFlow" doc:id="c58450bc-aed0-4635-bbce-a38f0eb83753" >
+		<http:listener doc:name="Listener" doc:id="e2c8bd88-5aa7-4bb0-9cc2-93adc29936e0" config-ref="HTTP_Listener_config" path="/products"/>
+		<try doc:name="Try" doc:id="92df67b2-58b8-45c2-b45a-3b5f1e3e0f29" >
+			<db:select doc:name="Select" doc:id="f9182eee-dc41-4b2e-84d3-e78ec5e8b850" config-ref="Database_Config">
+				<db:sql ><![CDATA[select * from product;]]></db:sql>
+		</db:select>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="84e9f284-87bc-473f-be73-d4fd0b196b39" >
+					<logger level="INFO" doc:name="Logger" doc:id="0699f30b-bbbb-4b4c-8873-9729e0addd66" message="db error"/>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="461f60a3-cad2-4d16-a3b5-a77d3ce4817c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+
+	
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<try doc:name="Try" doc:id="45f43e51-8bd2-40e5-bc34-27637936f1cc" >
+			<jms:publish doc:name="Publish" doc:id="63b95b25-e980-49bd-a61a-19291a180fca" config-ref="JMS_Config" destination="inputQ"/>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="801d9df0-b0c8-40b0-9fd5-6dd4850739bb" >
+					<file:write doc:name="Write" doc:id="d0e0e155-a8f0-468e-9833-f2c02d955a7d" path="C:\Users\Owner\Documents\my API\test1\output.xml"/>
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<set-payload value="yes bini" doc:name="Set Payload" doc:id="b5933270-ddde-4ad5-a8cd-e13dbb87981d" />
+	</flow>
+</mule>

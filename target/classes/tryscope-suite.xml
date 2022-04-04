@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="tryscope-suite.xml" />
+	<munit:test name="tryscopeFlow-test" doc:id="ed34e31e-c00d-4c7d-b4cb-c7541ea3c21b" >
+		<munit:behavior >
+			<munit-tools:spy doc:name="Spy Select" doc:id="1a3feb20-9a0e-432e-88a0-287fc8ec14d5" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f9182eee-dc41-4b2e-84d3-e78ec5e8b850" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="cc0d9d3d-3930-4490-86bc-29d578cb3d54" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import tryscopeFlowtest::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="2110ee13-5f04-45e2-adc0-4a2314bfa6df" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import tryscopeFlowtest::spy_assert_payload1
+---
+spy_assert_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="60f9a2b2-2f79-46fa-ad26-a5286c1cc974" >
+				<munit:payload value="#[readUrl('classpath://tryscopeFlowtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://tryscopeFlowtest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to tryscopeFlow" doc:id="5c841c1f-ee96-4058-a1c3-491ea6f837d6" name="tryscopeFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="7372b9ee-0301-4f93-911f-4d100e2b0641" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import tryscopeFlowtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify Transform Message" doc:id="85c7a4c5-5a21-40ff-8ad3-46e05ff92b43" processor="ee:transform" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="461f60a3-cad2-4d16-a3b5-a77d3ce4817c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Publish" doc:id="5a66be65-357f-4f9a-a407-b56301de37ed" processor="jms:publish" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="63b95b25-e980-49bd-a61a-19291a180fca" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Select" doc:id="99956acd-eecf-4252-a754-1f608ebf1d91" processor="db:select" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f9182eee-dc41-4b2e-84d3-e78ec5e8b850" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
